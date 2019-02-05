@@ -12,11 +12,12 @@ import QuartzCore
 
 @objc public class SAConfettiView: UIView {
 
-    @objc public enum ConfettiType: String {
-        case confetti = "confetti"
-        case triangle = "triangle"
-        case star = "star"
-        case diamond = "diamond"
+    @objc public enum ConfettiType: Int {
+        case confetti
+        case triangle
+        case star
+        case diamond
+        case image(UIImage)
     }
 
     var emitter: CAEmitterLayer?
@@ -81,18 +82,33 @@ import QuartzCore
     }
 
     @objc func imageForType(type: ConfettiType) -> UIImage? {
-        do {
-            guard let path = Bundle(for: SAConfettiView.self).path(forResource: "SAConfettiView", ofType: "bundle"),
-                let bundle = Bundle(path: path),
-                let imagePath = bundle.path(forResource: type.rawValue, ofType: "png"),
-                let image = UIImage(data: try Data(contentsOf: URL(fileURLWithPath: imagePath))) else {
-                    return nil
-            }
-            
-             return image
-        } catch {
-            return nil
+
+        var fileName: String!
+
+        switch type {
+        case .confetti:
+            fileName = "confetti"
+        case .triangle:
+            fileName = "triangle"
+        case .star:
+            fileName = "star"
+        case .diamond:
+            fileName = "diamond"
+        case let .image(customImage):
+            return customImage
         }
+
+        let path = Bundle(for: SAConfettiView.self).path(forResource: "SAConfettiView", ofType: "bundle")
+        let bundle = Bundle(path: path!)
+        let imagePath = bundle?.path(forResource: fileName, ofType: "png")
+        let url = URL(fileURLWithPath: imagePath!)
+        do {
+            let data = try Data(contentsOf: url)
+            return UIImage(data: data)
+        } catch {
+            print(error)
+        }
+        return nil
     }
 
     @objc func confettiWithColor(color: UIColor) -> CAEmitterCell? {
