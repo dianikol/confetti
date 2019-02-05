@@ -25,6 +25,7 @@ import QuartzCore
     public var intensity: Float?
     public var type: ConfettiType?
     private var active :Bool?
+    public var customImage: UIImage
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
