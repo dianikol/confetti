@@ -21,9 +21,9 @@ import QuartzCore
     }
 
     var emitter: CAEmitterLayer?
-    @objc public var colors: [UIColor]?
-    @objc public var intensity: Float?
-    @objc public var type: ConfettiType?
+    public var colors: [UIColor]?
+    public var intensity: Float?
+    public var type: ConfettiType?
     private var active :Bool?
     public var customImage: UIImage?
 
@@ -80,6 +80,18 @@ import QuartzCore
     @objc public func stopConfetti() {
         emitter?.birthRate = 0
         active = false
+    }
+
+    @objc public func setType(type: ConfettiType) {
+        self.type = type
+    }
+
+    @objc public func setColors(colors: [UIColor]) {
+        self.colors = colors
+    }
+
+    @objc public func setIntensity(intensity: Float) {
+        self.intensity = intensity
     }
 
     @objc func imageForType(type: ConfettiType) -> UIImage? {
