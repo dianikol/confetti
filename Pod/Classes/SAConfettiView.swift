@@ -4,6 +4,7 @@
 //
 //  Created by Sudeep Agarwal on 12/14/15.
 //
+// Updated by Robert Hanlon on 03/26/2018: Swift 4 support
 //
 
 import UIKit
@@ -11,19 +12,18 @@ import QuartzCore
 
 public class SAConfettiView: UIView {
 
-    public enum ConfettiType {
-        case confetti
-        case triangle
-        case star
-        case diamond
-        case image(UIImage)
+    public enum ConfettiType: String {
+        case confetti = "confetti"
+        case triangle = "triangle"
+        case star = "star"
+        case diamond = "diamond"
     }
 
-    var emitter: CAEmitterLayer!
-    public var colors: [UIColor]!
-    public var intensity: Float!
-    public var type: ConfettiType!
-    private var active :Bool!
+    var emitter: CAEmitterLayer?
+    public var colors: [UIColor]?
+    public var intensity: Float?
+    public var type: ConfettiType?
+    private var active :Bool?
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -49,16 +49,28 @@ public class SAConfettiView: UIView {
     public func startConfetti() {
         emitter = CAEmitterLayer()
 
-        emitter.emitterPosition = CGPoint(x: frame.size.width / 2.0, y: 0)
-        emitter.emitterShape = CAEmitterLayerEmitterShape.line
-        emitter.emitterSize = CGSize(width: frame.size.width, height: 1)
+        emitter?.emitterPosition = CGPoint(x: frame.size.width / 2.0, y: 0)
+        emitter?.emitterShape = kCAEmitterLayerLine
+        emitter?.emitterSize = CGSize(width: frame.size.width, height: 1)
 
         var cells = [CAEmitterCell]()
+        
+        guard let colors = self.colors else {
+            return
+        }
+        
         for color in colors {
-            cells.append(confettiWithColor(color: color))
+            if let confetti = confettiWithColor(color: color) {
+                cells.append(confetti)
+            }
         }
 
-        emitter.emitterCells = cells
+        emitter?.emitterCells = cells
+        
+        guard let emitter = emitter else {
+            return
+        }
+        
         layer.addSublayer(emitter)
         active = true
     }
@@ -69,36 +81,25 @@ public class SAConfettiView: UIView {
     }
 
     func imageForType(type: ConfettiType) -> UIImage? {
-
-        var fileName: String!
-
-        switch type {
-        case .confetti:
-            fileName = "confetti"
-        case .triangle:
-            fileName = "triangle"
-        case .star:
-            fileName = "star"
-        case .diamond:
-            fileName = "diamond"
-        case let .image(customImage):
-            return customImage
-        }
-
-        let path = Bundle(for: SAConfettiView.self).path(forResource: "SAConfettiView", ofType: "bundle")
-        let bundle = Bundle(path: path!)
-        let imagePath = bundle?.path(forResource: fileName, ofType: "png")
-        let url = URL(fileURLWithPath: imagePath!)
         do {
-            let data = try Data(contentsOf: url)
-            return UIImage(data: data)
+            guard let path = Bundle(for: SAConfettiView.self).path(forResource: "SAConfettiView", ofType: "bundle"),
+                let bundle = Bundle(path: path),
+                let imagePath = bundle.path(forResource: type.rawValue, ofType: "png"),
+                let image = UIImage(data: try Data(contentsOf: URL(fileURLWithPath: imagePath))) else {
+                    return nil
+            }
+            
+             return image
         } catch {
-            print(error)
+            return nil
         }
-        return nil
     }
 
-    func confettiWithColor(color: UIColor) -> CAEmitterCell {
+    func confettiWithColor(color: UIColor) -> CAEmitterCell? {
+        guard let intensity = self.intensity, let type = type else {
+            return nil
+        }
+        
         let confetti = CAEmitterCell()
         confetti.birthRate = 6.0 * intensity
         confetti.lifetime = 14.0 * intensity
@@ -112,11 +113,11 @@ public class SAConfettiView: UIView {
         confetti.spinRange = CGFloat(4.0 * intensity)
         confetti.scaleRange = CGFloat(intensity)
         confetti.scaleSpeed = CGFloat(-0.1 * intensity)
-        confetti.contents = imageForType(type: type)!.cgImage
+        confetti.contents = imageForType(type: type)?.cgImage
         return confetti
     }
 
     public func isActive() -> Bool {
-            return self.active
+        return self.active ?? false
     }
 }
