@@ -12,7 +12,7 @@ import QuartzCore
 
 @objc public class SAConfettiView: UIView {
 
-    public enum ConfettiType: String {
+    @objc public enum ConfettiType: String {
         case confetti = "confetti"
         case triangle = "triangle"
         case star = "star"
@@ -75,12 +75,12 @@ import QuartzCore
         active = true
     }
 
-    public func stopConfetti() {
+    @objc public func stopConfetti() {
         emitter?.birthRate = 0
         active = false
     }
 
-    func imageForType(type: ConfettiType) -> UIImage? {
+    @objc func imageForType(type: ConfettiType) -> UIImage? {
         do {
             guard let path = Bundle(for: SAConfettiView.self).path(forResource: "SAConfettiView", ofType: "bundle"),
                 let bundle = Bundle(path: path),
@@ -95,7 +95,7 @@ import QuartzCore
         }
     }
 
-    func confettiWithColor(color: UIColor) -> CAEmitterCell? {
+    @objc func confettiWithColor(color: UIColor) -> CAEmitterCell? {
         guard let intensity = self.intensity, let type = type else {
             return nil
         }
@@ -117,7 +117,7 @@ import QuartzCore
         return confetti
     }
 
-    public func isActive() -> Bool {
+    @objc public func isActive() -> Bool {
         return self.active ?? false
     }
 }
