@@ -21,9 +21,9 @@ import QuartzCore
     }
 
     var emitter: CAEmitterLayer?
-    public var colors: [UIColor]?
-    public var intensity: Float?
-    public var type: ConfettiType?
+    @objc public var colors: [UIColor]?
+    @objc public var intensity: Float?
+    @objc public var type: ConfettiType?
     private var active :Bool?
     public var customImage: UIImage?
 
